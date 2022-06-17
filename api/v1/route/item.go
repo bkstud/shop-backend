@@ -1,27 +1,19 @@
 package route
 
 import (
-	"net/http"
+	"shop/api/v1/controller"
 
 	"github.com/gin-gonic/gin"
 )
 
 func addItemRoutes(rg *gin.RouterGroup) {
 	itemGroup := rg.Group("/items")
-	itemGroup.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "returns list of items")
-	})
 
-	itemGroup.POST("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "adds new item to db")
-	})
+	itemGroup.GET("/", controller.GetItems)
 
-	itemGroup.PATCH("/:id", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "edits item with id")
-	})
+	itemGroup.POST("/", controller.CreateItem)
 
-	itemGroup.DELETE("/:id", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "deletes item with id")
-	})
+	itemGroup.PATCH("/:id", controller.EditItem)
 
+	itemGroup.DELETE("/:id", controller.DeleteItem)
 }

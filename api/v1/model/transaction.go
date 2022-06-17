@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Transaction struct {
 	gorm.Model
-	ItemID  Item
+	ItemID  uint
 	Item    Item
 	BuyerID uint
 	Buyer   User
