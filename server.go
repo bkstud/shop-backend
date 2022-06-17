@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"shop/api/v1/route"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
