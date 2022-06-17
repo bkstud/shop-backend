@@ -9,7 +9,6 @@ var (
 	router = gin.Default()
 )
 
-// Run will start the server
 func main() {
 	v1 := router.Group("/api/v1")
 	route.AddRoutes(v1)
