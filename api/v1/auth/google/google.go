@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"shop/api/v1/auth"
+	"shop/config"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -19,11 +20,11 @@ func init() {
 	if err != nil {
 		fmt.Println("Failed to initialize google credentials")
 	}
-
+	redirectUrl := fmt.Sprintf("%s:%d/api/v1/auth/github", config.SERVER_ADDRESS, config.SERVER_PORT)
 	conf = &oauth2.Config{
 		ClientID:     cred.Cid,
 		ClientSecret: cred.Csecret,
-		RedirectURL:  "http://127.0.0.1:80/auth/google",
+		RedirectURL:  redirectUrl,
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 		},

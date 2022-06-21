@@ -3,6 +3,7 @@ package github
 import (
 	"fmt"
 	"shop/api/v1/auth"
+	"shop/config"
 
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
@@ -18,11 +19,11 @@ func init() {
 	if err != nil {
 		fmt.Println("Failed to initialize github credentials")
 	}
-
+	redirectUrl := fmt.Sprintf("%s:%d/api/v1/auth/github", config.SERVER_ADDRESS, config.SERVER_PORT)
 	conf = &oauth2.Config{
 		ClientID:     cred.Cid,
 		ClientSecret: cred.Csecret,
-		RedirectURL:  "http://localhost:80/auth/github",
+		RedirectURL:  redirectUrl,
 		Endpoint:     github.Endpoint,
 	}
 }

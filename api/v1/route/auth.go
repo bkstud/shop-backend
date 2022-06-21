@@ -1,7 +1,8 @@
 package route
 
 import (
-	"net/http"
+	"shop/api/v1/auth/github"
+	"shop/api/v1/auth/google"
 
 	"github.com/gin-gonic/gin"
 )
@@ -10,19 +11,9 @@ func addAuthRoutes(rg *gin.RouterGroup) {
 	loginGroup := rg.Group("/login")
 	authGroup := rg.Group("/auth")
 
-	loginGroup.GET("/google", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "login google")
-	})
+	loginGroup.GET("/google", google.LoginHandler)
+	loginGroup.GET("/github", github.LoginHandler)
 
-	loginGroup.GET("/github", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "login github")
-	})
-
-	authGroup.GET("/google", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "auth google")
-	})
-
-	authGroup.GET("/github", func(c *gin.Context) {
-		c.JSON(http.StatusOK, "auth github")
-	})
+	authGroup.GET("/google", google.AuthHandler)
+	authGroup.GET("/github", github.AuthHandler)
 }

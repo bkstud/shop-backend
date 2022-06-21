@@ -85,7 +85,7 @@ func AuthHandler(c *gin.Context, conf *oauth2.Config) {
 	// We dont need it for simple auth
 	_, err := conf.Exchange(context.Background(), code)
 	if err != nil {
-		log.Println(err)
+		log.Println("error:=", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Login failed. Please try again."})
 		return
 	}
