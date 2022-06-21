@@ -20,7 +20,7 @@ func init() {
 	if err != nil {
 		fmt.Println("Failed to initialize google credentials")
 	}
-	redirectUrl := fmt.Sprintf("%s:%d/api/v1/auth/github", config.SERVER_ADDRESS, config.SERVER_PORT)
+	redirectUrl := fmt.Sprintf("%s:%d/api/v1/auth/google", config.SERVER_ADDRESS, config.SERVER_PORT)
 	conf = &oauth2.Config{
 		ClientID:     cred.Cid,
 		ClientSecret: cred.Csecret,
