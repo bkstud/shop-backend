@@ -2,6 +2,7 @@ package github
 
 import (
 	"fmt"
+	"log"
 	"shop/api/v1/auth"
 	"shop/config"
 
@@ -17,7 +18,7 @@ func init() {
 	var err error
 	cred, err = auth.ReadOauthSecrets("./github-creds.json", "GITHUB")
 	if err != nil {
-		fmt.Println("Failed to initialize github credentials")
+		log.Panic("Failed to initialize github credentials")
 	}
 	redirectUrl := fmt.Sprintf("%s:%d/api/v1/auth/github", config.SERVER_ADDRESS, config.SERVER_PORT)
 	conf = &oauth2.Config{

@@ -18,7 +18,7 @@ func init() {
 	var err error
 	cred, err = auth.ReadOauthSecrets("./google-creds.json", "GOOGLE")
 	if err != nil {
-		fmt.Println("Failed to initialize google credentials")
+		log.Panic("Failed to initialize google credentials")
 	}
 	redirectUrl := fmt.Sprintf("%s:%d/api/v1/auth/google", config.SERVER_ADDRESS, config.SERVER_PORT)
 	conf = &oauth2.Config{
@@ -26,7 +26,8 @@ func init() {
 		ClientSecret: cred.Csecret,
 		RedirectURL:  redirectUrl,
 		Scopes: []string{
-			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
+			"https://www.googleapis.com/auth/userinfo.email",
+			// You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 		},
 		Endpoint: google.Endpoint,
 	}

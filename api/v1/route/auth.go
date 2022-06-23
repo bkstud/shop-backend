@@ -1,6 +1,7 @@
 package route
 
 import (
+	"shop/api/v1/auth/facebook"
 	"shop/api/v1/auth/github"
 	"shop/api/v1/auth/google"
 
@@ -13,7 +14,9 @@ func addAuthRoutes(rg *gin.RouterGroup) {
 
 	loginGroup.GET("/google", google.LoginHandler)
 	loginGroup.GET("/github", github.LoginHandler)
+	loginGroup.GET("/facebook", facebook.LoginHandler)
 
 	authGroup.GET("/google", google.AuthHandler)
 	authGroup.GET("/github", github.AuthHandler)
+	authGroup.GET("/facebook", facebook.AuthHandler)
 }
