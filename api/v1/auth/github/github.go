@@ -16,7 +16,7 @@ var conf *oauth2.Config
 
 func init() {
 	var err error
-	cred, err = auth.ReadOauthSecrets("./github-creds.json", "GITHUB")
+	cred, err = auth.ReadOauthSecrets("./secrets/github-creds.json", "GITHUB")
 	if err != nil {
 		log.Panic("Failed to initialize github credentials")
 	}

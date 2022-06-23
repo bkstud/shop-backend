@@ -16,7 +16,7 @@ var conf *oauth2.Config
 
 func init() {
 	var err error
-	cred, err = auth.ReadOauthSecrets("./google-creds.json", "GOOGLE")
+	cred, err = auth.ReadOauthSecrets("./secrets/google-creds.json", "GOOGLE")
 	if err != nil {
 		log.Panic("Failed to initialize google credentials")
 	}
