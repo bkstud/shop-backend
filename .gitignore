@@ -2,3 +2,4 @@ shop.db
 github-creds.json
 google-creds.json
 facebook-creds.json
+secrets/
