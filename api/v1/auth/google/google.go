@@ -41,5 +41,6 @@ func LoginHandler(c *gin.Context) {
 
 func AuthHandler(c *gin.Context) {
 	log.Printf("google auth handler")
-	auth.AuthHandler(c, conf)
+	authClient := auth.AuthHandler(c, conf)
+	fmt.Println(authClient)
 }

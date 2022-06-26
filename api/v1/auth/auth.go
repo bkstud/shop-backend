@@ -12,6 +12,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 )
@@ -72,24 +73,39 @@ func LoginHandler(c *gin.Context, conf *oauth2.Config) {
 		return
 	}
 
+	session := sessions.Default(c)
+	session.Set("state", state)
+	err = session.Save()
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{"message": "Error while saving session."})
+		return
+	}
+
 	link := conf.AuthCodeURL(state)
 	log.Printf("link:= %s", link)
 	c.Redirect(http.StatusTemporaryRedirect, link)
 }
 
-func AuthHandler(c *gin.Context, conf *oauth2.Config) {
-	log.Printf("auth handler")
+func AuthHandler(c *gin.Context, conf *oauth2.Config) *http.Client {
+	session := sessions.Default(c)
+	retrievedState := session.Get("state")
+	queryState := c.Request.URL.Query().Get("state")
+	if retrievedState != queryState {
+		log.Printf("Invalid session state: retrieved: %s; Param: %s", retrievedState, queryState)
+		c.HTML(http.StatusUnauthorized, "error.tmpl", gin.H{"message": "Invalid session state."})
+		return nil
+	}
+
 	code := c.Request.URL.Query().Get("code")
 	log.Printf("code:= %v", code)
-	// The first parameter is token that could be used for some api calls
-	// We dont need it for simple auth
-	_, err := conf.Exchange(context.Background(), code)
+	tok, err := conf.Exchange(context.Background(), code)
 	if err != nil {
 		log.Println("error:=", err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Login failed. Please try again."})
-		return
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Login failed. Please try again."})
+		return nil
 	}
 	// sessionToken, _ := RandToken(32)
-
+	client := conf.Client(context.Background(), tok)
 	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
+	return client
 }
