@@ -3,6 +3,7 @@ package github
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"shop/api/v1/auth"
 	"shop/config"
 
@@ -26,6 +27,7 @@ func init() {
 		ClientSecret: cred.Csecret,
 		RedirectURL:  redirectUrl,
 		Endpoint:     github.Endpoint,
+		Scopes:       []string{"user", "public_profile", "user:email"},
 	}
 }
 func LoginHandler(c *gin.Context) {
@@ -33,5 +35,11 @@ func LoginHandler(c *gin.Context) {
 }
 
 func AuthHandler(c *gin.Context) {
-	auth.AuthHandler(c, conf)
+	client := auth.AuthHandler(c, conf)
+	data := auth.GetUserData(c, client, "https://api.github.com/user/emails")
+	// TODO: This data is array of jsons we need to parse and one of them have field "primary": "true"
+	// This one we use for user-id
+	log.Println("github data:=", string(data))
+
+	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
 }

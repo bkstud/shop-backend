@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"shop/api/v1/model"
 
 	"log"
 	"net/http"
@@ -106,6 +107,32 @@ func AuthHandler(c *gin.Context, conf *oauth2.Config) *http.Client {
 	}
 	// sessionToken, _ := RandToken(32)
 	client := conf.Client(context.Background(), tok)
-	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
+
 	return client
+}
+
+func GetUserData(c *gin.Context, client *http.Client, dataEndpoint string) []byte {
+	userinfo, err := client.Get(dataEndpoint)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithStatus(http.StatusBadRequest)
+		return nil
+	}
+	defer userinfo.Body.Close()
+	data, _ := ioutil.ReadAll(userinfo.Body)
+	return data
+
+}
+
+func SetIdentity(c *gin.Context, identity string) {
+	session := sessions.Default(c)
+	u := model.User{}
+	session.Set("user-id", identity)
+	err := session.Save()
+	if err != nil {
+		log.Println(err)
+		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{"message": "Error while saving session. Please try again."})
+		return
+	}
+	u.Identity = identity
 }

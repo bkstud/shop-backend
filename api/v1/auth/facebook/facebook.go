@@ -3,6 +3,7 @@ package facebook
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"shop/api/v1/auth"
 	"shop/config"
 
@@ -25,7 +26,7 @@ func init() {
 		ClientID:     cred.Cid,
 		ClientSecret: cred.Csecret,
 		RedirectURL:  redirectUrl,
-		Scopes:       []string{"email"},
+		Scopes:       []string{"email", "read_stream"},
 		Endpoint:     facebook.Endpoint,
 	}
 }
@@ -38,5 +39,15 @@ func LoginHandler(c *gin.Context) {
 
 func AuthHandler(c *gin.Context) {
 	log.Printf("facebook auth handler")
-	auth.AuthHandler(c, conf)
+	client := auth.AuthHandler(c, conf)
+	if client == nil {
+		return
+	}
+	data := auth.GetUserData(c, client, "https://graph.facebook.com/me?fields=name,email")
+	if data == nil {
+		return
+	}
+	log.Println("fb data:=", string(data))
+
+	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
 }

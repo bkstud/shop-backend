@@ -1,15 +1,12 @@
 package google
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"shop/api/v1/auth"
 	"shop/config"
 
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -46,31 +43,10 @@ func LoginHandler(c *gin.Context) {
 func AuthHandler(c *gin.Context) {
 	log.Printf("google auth handler")
 	client := auth.AuthHandler(c, conf)
-	log.Println("authHandler:=", client)
-	userinfo, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
-	if err != nil {
-		log.Println(err)
-		c.AbortWithStatus(http.StatusBadRequest)
-		return
-	}
-	log.Println("authHandler:=", userinfo)
-	defer userinfo.Body.Close()
-	data, _ := ioutil.ReadAll(userinfo.Body)
 
-	session := sessions.Default(c)
-	u := User{}
-	if err = json.Unmarshal(data, &u); err != nil {
-		log.Println(err)
-		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{"message": "Error marshalling response. Please try agian."})
-		return
-	}
-	session.Set("user-id", u.Email)
-	err = session.Save()
-	if err != nil {
-		log.Println(err)
-		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{"message": "Error while saving session. Please try again."})
-		return
-	}
-	log.Println("email of auth user:=", u.Email)
+	data := auth.GetUserData(c, client, "https://www.googleapis.com/oauth2/v3/userinfo")
+	log.Println("google data:=", string(data))
+
+	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
 
 }
