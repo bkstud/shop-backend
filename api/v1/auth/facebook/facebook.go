@@ -26,7 +26,7 @@ func init() {
 		ClientID:     cred.Cid,
 		ClientSecret: cred.Csecret,
 		RedirectURL:  redirectUrl,
-		Scopes:       []string{"email", "read_stream"},
+		Scopes:       []string{"email", "public_profile"},
 		Endpoint:     facebook.Endpoint,
 	}
 }

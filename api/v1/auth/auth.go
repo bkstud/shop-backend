@@ -121,18 +121,17 @@ func GetUserData(c *gin.Context, client *http.Client, dataEndpoint string) []byt
 	defer userinfo.Body.Close()
 	data, _ := ioutil.ReadAll(userinfo.Body)
 	return data
-
 }
 
-func SetIdentity(c *gin.Context, identity string) {
+func SetIdentityEmail(c *gin.Context, email string) {
 	session := sessions.Default(c)
 	u := model.User{}
-	session.Set("user-id", identity)
+	session.Set("user-id", email)
 	err := session.Save()
 	if err != nil {
 		log.Println(err)
 		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{"message": "Error while saving session. Please try again."})
 		return
 	}
-	u.Identity = identity
+	u.Email = email
 }
