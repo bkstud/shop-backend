@@ -1,6 +1,7 @@
 package facebook
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -48,6 +49,13 @@ func AuthHandler(c *gin.Context) {
 		return
 	}
 	log.Println("fb data:=", string(data))
+
+	user := auth.Response{}
+	if err := json.Unmarshal(data, &user); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error marshalling response. Please try agian."})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
 }

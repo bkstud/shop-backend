@@ -1,6 +1,7 @@
 package google
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -46,6 +47,13 @@ func AuthHandler(c *gin.Context) {
 
 	data := auth.GetUserData(c, client, "https://www.googleapis.com/oauth2/v3/userinfo")
 	log.Println("google data:=", string(data))
+
+	user := auth.Response{}
+	if err := json.Unmarshal(data, &user); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error marshalling response. Please try agian."})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
 

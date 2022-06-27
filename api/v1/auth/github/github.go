@@ -1,6 +1,7 @@
 package github
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -40,6 +41,19 @@ func AuthHandler(c *gin.Context) {
 	// TODO: This data is array of jsons we need to parse and one of them have field "primary": "true"
 	// This one we use for user-id
 	log.Println("github data:=", string(data))
-
+	users := []auth.Response{}
+	if err := json.Unmarshal(data, &users); err != nil {
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error marshalling response. Please try agian."})
+		return
+	}
+	var primaryUser auth.Response
+	for _, user := range users {
+		if user.Primary {
+			primaryUser = user
+			break
+		}
+	}
+	log.Println("primaryUser:=", primaryUser)
 	c.JSON(http.StatusOK, gin.H{"message": "auth succeded"})
 }
