@@ -8,6 +8,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+	"shop/api/v1/database"
 	"shop/api/v1/model"
 
 	"log"
@@ -67,7 +68,6 @@ func RandToken(l int) (string, error) {
 }
 
 func LoginHandler(c *gin.Context, conf *oauth2.Config) {
-	log.Println("login handler")
 	state, err := RandToken(32)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
@@ -83,7 +83,6 @@ func LoginHandler(c *gin.Context, conf *oauth2.Config) {
 	}
 
 	link := conf.AuthCodeURL(state)
-	log.Printf("link:= %s", link)
 	c.Redirect(http.StatusTemporaryRedirect, link)
 }
 
@@ -98,14 +97,13 @@ func AuthHandler(c *gin.Context, conf *oauth2.Config) *http.Client {
 	}
 
 	code := c.Request.URL.Query().Get("code")
-	log.Printf("code:= %v", code)
 	tok, err := conf.Exchange(context.Background(), code)
 	if err != nil {
 		log.Println("error:=", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Login failed. Please try again."})
 		return nil
 	}
-	// sessionToken, _ := RandToken(32)
+
 	client := conf.Client(context.Background(), tok)
 
 	return client
@@ -134,4 +132,17 @@ func SetIdentityEmail(c *gin.Context, email string) {
 		return
 	}
 	u.Email = email
+}
+
+func CreateUserFromResponse(responseUser *Response) model.User {
+	user := model.User{}
+	db := database.Database
+	exists := db.First(&user, "email = ?", responseUser.Email)
+	if exists.Error != nil {
+		user.Email = responseUser.Email
+		user.Name = responseUser.Name
+		user.Type = responseUser.Type
+		db.Create(&user)
+	}
+	return user
 }

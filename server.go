@@ -24,7 +24,7 @@ func main() {
 		Path:   "/",
 		MaxAge: 86400 * 7,
 	})
-	routerHttps.Use(gin.Logger())
+
 	routerHttps.Use(gin.Recovery())
 	routerHttps.Use(sessions.Sessions("store", store))
 
