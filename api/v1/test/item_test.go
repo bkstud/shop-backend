@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -11,8 +12,12 @@ import (
 
 var ENDPOINT = "localhost:5000/api/v1/items"
 
+func init() {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+}
 func TestGetEndpoint(t *testing.T) {
-	resp, err := http.Get(fmt.Sprintf("http://%s", ENDPOINT))
+
+	resp, err := http.Get(fmt.Sprintf("https://%s", ENDPOINT))
 	if err != nil {
 		t.Errorf("Error in get response %s", err)
 	}
@@ -33,7 +38,7 @@ func TestCreateItem(t *testing.T) {
 		"Description": "Running shoes",
 	})
 
-	resp, err := http.Post(fmt.Sprintf("http://%s", ENDPOINT), "application/json",
+	resp, err := http.Post(fmt.Sprintf("https://%s", ENDPOINT), "application/json",
 		bytes.NewBuffer(postBody))
 
 	if err != nil {
@@ -55,7 +60,7 @@ func TestCreateItem(t *testing.T) {
 }
 
 func TestEditItem(t *testing.T) {
-	resp, _ := http.Get(fmt.Sprintf("http://%s", ENDPOINT))
+	resp, _ := http.Get(fmt.Sprintf("https://%s", ENDPOINT))
 	if resp.StatusCode != 200 {
 		t.Errorf("Got response %d instead 200", resp.StatusCode)
 	}
@@ -70,7 +75,7 @@ func TestEditItem(t *testing.T) {
 	})
 
 	req, _ := http.NewRequest(http.MethodPatch,
-		fmt.Sprintf("http://%s/%d", ENDPOINT, id),
+		fmt.Sprintf("https://%s/%d", ENDPOINT, id),
 		bytes.NewBuffer(patchBody))
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	res, err := http.DefaultClient.Do(req)
@@ -95,7 +100,7 @@ func TestEditItem(t *testing.T) {
 	}
 }
 func TestRemoveItem(t *testing.T) {
-	resp, _ := http.Get(fmt.Sprintf("http://%s", ENDPOINT))
+	resp, _ := http.Get(fmt.Sprintf("https://%s", ENDPOINT))
 	if resp.StatusCode != 200 {
 		t.Errorf("Got response %d instead 200", resp.StatusCode)
 	}
@@ -108,7 +113,7 @@ func TestRemoveItem(t *testing.T) {
 	id := outArr[0].ID
 
 	req, _ := http.NewRequest(http.MethodDelete,
-		fmt.Sprintf("http://%s/%d", ENDPOINT, id),
+		fmt.Sprintf("https://%s/%d", ENDPOINT, id),
 		nil)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
