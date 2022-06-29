@@ -123,17 +123,16 @@ func GetUserData(c *gin.Context, client *http.Client, dataEndpoint string) []byt
 
 func SetIdentityEmail(c *gin.Context, email string) {
 	session := sessions.Default(c)
-	u := model.User{}
 	session.Set("user-id", email)
 	err := session.Save()
 	if err != nil {
 		log.Println(err)
-		c.HTML(http.StatusBadRequest, "error.tmpl", gin.H{"message": "Error while saving session. Please try again."})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while saving session. Please try again."})
 		return
 	}
-	u.Email = email
 }
 
+// Creates new user if does not exists with following email or returns existent one.
 func CreateUserFromResponse(responseUser *Response) model.User {
 	user := model.User{}
 	db := database.Database

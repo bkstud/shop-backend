@@ -54,6 +54,7 @@ func AuthHandler(c *gin.Context) {
 		return
 	}
 	resp.Type = "google"
+	auth.SetIdentityEmail(c, resp.Email)
 	user := auth.CreateUserFromResponse(&resp)
 
 	c.JSON(http.StatusOK, gin.H{"message": "auth succeded", "user": user})

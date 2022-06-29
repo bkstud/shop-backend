@@ -54,6 +54,7 @@ func AuthHandler(c *gin.Context) {
 		}
 	}
 	primaryUser.Type = "github"
+	auth.SetIdentityEmail(c, primaryUser.Email)
 	user := auth.CreateUserFromResponse(&primaryUser)
 
 	c.JSON(http.StatusOK, gin.H{"message": "auth succeded", "user": user})
