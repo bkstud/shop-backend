@@ -18,7 +18,7 @@ func findItemById(c *gin.Context, id string) *model.Item {
 	result := db.First(&item, id)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		c.JSON(http.StatusNotFound,
-			gin.H{"error": fmt.Sprintf("Item with id %s not found", id)})
+			gin.H{"error": fmt.Sprintf("Item with id '%s' not found", id)})
 		return nil
 
 	}
@@ -41,9 +41,9 @@ func CreateItem(c *gin.Context) {
 		return
 	}
 
-	if result := db.Create(item); result.Error != nil {
+	if err := db.Create(item).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": result.Error})
+			"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, item)
@@ -62,9 +62,9 @@ func EditItem(c *gin.Context) {
 		return
 	}
 
-	if result := db.Model(&item).Updates(newItem); result.Error != nil {
+	if err := db.Model(&item).Updates(newItem).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": result.Error})
+			"error": err.Error()})
 		return
 	}
 
@@ -76,12 +76,13 @@ func DeleteItem(c *gin.Context) {
 	id := c.Param("id")
 	item := findItemById(c, id)
 	if item == nil {
+		// The response is already handled by findItemById
 		return
 	}
 
-	if result := db.Delete(&item); result.Error != nil {
+	if err := db.Delete(&item).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": result.Error})
+			"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, item)

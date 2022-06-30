@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"shop/api/v1/model"
 	"testing"
@@ -33,11 +34,12 @@ func TestGetEndpoint(t *testing.T) {
 }
 
 func TestCreateItem(t *testing.T) {
-	postBody, _ := json.Marshal(map[string]string{
-		"Name":        "Nike Shoes",
-		"Description": "Running shoes",
+	postBody, _ := json.Marshal(model.Item{
+		Name:        "Nike Shoes",
+		Description: "Running shoes",
+		Status:      "available",
+		Price:       180.80,
 	})
-
 	resp, err := http.Post(fmt.Sprintf("https://%s", ENDPOINT), "application/json",
 		bytes.NewBuffer(postBody))
 
@@ -47,6 +49,8 @@ func TestCreateItem(t *testing.T) {
 
 	if resp.StatusCode != 200 {
 		t.Errorf("Got response %d instead 200", resp.StatusCode)
+		data, _ := io.ReadAll(resp.Body)
+		t.Errorf("Response json: %s", string(data))
 	}
 
 	var out = model.Item{}
@@ -56,6 +60,9 @@ func TestCreateItem(t *testing.T) {
 	}
 	if out.Description != "Running shoes" {
 		t.Errorf("Response have wrong description '%s' should be 'Running shoes'", out.Name)
+	}
+	if out.Status != "available" {
+		t.Errorf("Response have wrong description '%s' should be 'sold'", out.Status)
 	}
 }
 
@@ -69,9 +76,11 @@ func TestEditItem(t *testing.T) {
 	json.NewDecoder(resp.Body).Decode(&outArr)
 	id := outArr[0].ID
 
-	patchBody, _ := json.Marshal(map[string]string{
-		"Name":        "Adidas shoes",
-		"Description": "Sneakers shoes",
+	patchBody, _ := json.Marshal(model.Item{
+		Name:        "Adidas shoes",
+		Description: "Sneakers shoes",
+		Status:      "sold",
+		Price:       220.22,
 	})
 
 	req, _ := http.NewRequest(http.MethodPatch,
@@ -97,6 +106,9 @@ func TestEditItem(t *testing.T) {
 	}
 	if patchOut.Description != "Sneakers shoes" {
 		t.Errorf("Response have wrong description '%s' should be 'Sneakers shoes'", patchOut.Description)
+	}
+	if patchOut.Status != "sold" {
+		t.Errorf("Response have wrong description '%s' should be 'sold'", patchOut.Status)
 	}
 }
 func TestRemoveItem(t *testing.T) {
