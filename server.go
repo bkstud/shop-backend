@@ -1,7 +1,10 @@
 package main
 
 import (
+	"errors"
+	"io/ioutil"
 	"log"
+	"os"
 	"shop/api/v1/auth"
 	"shop/api/v1/route"
 
@@ -31,6 +34,29 @@ func main() {
 	v1 := routerHttps.Group("/api/v1")
 	route.AddRoutes(v1)
 
+	GetCertAndKey()
 	routerHttps.RunTLS(":5000", "./cert/cert.pem", "./cert/key.pem")
 
+}
+
+func GetCertAndKey() {
+	varFile := map[string]string{"VAR_CERT": "./cert/cert.pem", "VAR_PRIVKEY": "./cert/key.pem"}
+	if _, err := os.Stat("./cert"); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir("./cert", 0755)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		return
+	}
+
+	for variable, file := range varFile {
+		value, exists := os.LookupEnv(variable)
+		if exists {
+			err := ioutil.WriteFile(file, []byte(value), 0644)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
 }
