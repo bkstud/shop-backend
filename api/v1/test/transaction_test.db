@@ -1,7 +1,0 @@
-package test
-
-var ENDPOINT = "localhost:5000/api/v1/items"
-
-func init() {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
-}

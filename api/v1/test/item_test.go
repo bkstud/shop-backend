@@ -48,7 +48,7 @@ func TestCreateItem(t *testing.T) {
 		bytes.NewBuffer(postBody))
 
 	if err != nil {
-		t.Errorf("Error in get response %s", err)
+		t.Errorf("Error in post response %s", err)
 	}
 
 	if resp.StatusCode != 200 {
