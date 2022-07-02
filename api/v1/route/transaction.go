@@ -1,7 +1,7 @@
 package route
 
 import (
-	"net/http"
+	"shop/api/v1/controller"
 	"shop/api/v1/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -12,20 +12,12 @@ func addTransactionRoutes(rg *gin.RouterGroup) {
 
 	transactionGroup.Use(middleware.AuthorizeRequest())
 	{
-		transactionGroup.GET("/", func(c *gin.Context) {
-			c.JSON(http.StatusOK, "returns list of transactions")
-		})
+		transactionGroup.GET("/", controller.GetTransactions)
 
-		transactionGroup.POST("/", func(c *gin.Context) {
-			c.JSON(http.StatusOK, "adds new transaction to db")
-		})
+		transactionGroup.POST("/", controller.CreateTransaction)
 
-		transactionGroup.PATCH("/:id", func(c *gin.Context) {
-			c.JSON(http.StatusOK, "edits transaction with id")
-		})
+		transactionGroup.PATCH("/:id", controller.EditTransaction)
 
-		transactionGroup.DELETE("/:id", func(c *gin.Context) {
-			c.JSON(http.StatusOK, "deletes transaction with id")
-		})
+		transactionGroup.DELETE("/:id", controller.DeleteTransaction)
 	}
 }
