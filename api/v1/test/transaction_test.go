@@ -44,23 +44,28 @@ func TestGetEndpoint(t *testing.T) {
 
 }
 func TestCreateTransaction(t *testing.T) {
-	itemBody, _ := json.Marshal(model.Item{
+	item := model.Item{
 		Name:        "Nike Shoes",
 		Description: "Running shoes",
 		Status:      "available",
 		Price:       180.80,
-	})
+	}
 
-	userBody, _ := json.Marshal(model.User{
+	user := model.User{
 		Email: "test@gmail.com",
 		Name:  "Adam",
 		Type:  "google",
-	})
+	}
 
-	postBody := append([]byte(itemBody), []byte(userBody)...)
+	transaction := model.Transaction{
+		User:   user,
+		Item:   item,
+		Status: "pending",
+	}
+	data, _ := json.Marshal(transaction)
 
 	resp, err := http.Post(ENDPOINT.TRANSACTION, "application/json",
-		bytes.NewBuffer(postBody))
+		bytes.NewBuffer(data))
 
 	if err != nil {
 		t.Errorf("Error in post response %s", err)

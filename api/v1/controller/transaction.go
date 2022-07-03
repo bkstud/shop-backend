@@ -3,11 +3,13 @@ package controller
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"shop/api/v1/model"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func findTransactionById(c *gin.Context, id string) *model.Transaction {
@@ -26,7 +28,7 @@ func findTransactionById(c *gin.Context, id string) *model.Transaction {
 // returns all transactions
 func GetTransactions(c *gin.Context) {
 	var transactions []model.Transaction
-	Db.Find(&transactions)
+	Db.Preload(clause.Associations).Preload("User").Find(&transactions)
 	c.JSON(http.StatusOK, transactions)
 }
 
@@ -37,12 +39,12 @@ func CreateTransaction(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-
 	if err := Db.Create(transaction).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error()})
 		return
 	}
+	log.Println("USERID:=", transaction.UserID)
 	c.JSON(http.StatusOK, transaction)
 }
 

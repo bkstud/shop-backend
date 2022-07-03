@@ -6,6 +6,7 @@ import (
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var (
@@ -20,13 +21,16 @@ func init() {
 		os.Remove(DB_NAME)
 	}
 
-	db, err := gorm.Open(sqlite.Open(DB_NAME), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(DB_NAME), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		panic("failed to connect database")
 	}
 
 	// Migrate the schema
 	db.AutoMigrate(&model.Item{})
+	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Transaction{})
 
 	Database = db
