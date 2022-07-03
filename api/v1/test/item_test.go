@@ -11,18 +11,15 @@ import (
 	"io"
 	"net/http"
 	"shop/api/v1/model"
-	"shop/config"
 	"testing"
 )
-
-var ENDPOINT = fmt.Sprintf("%s:%d/api/v1/items", config.SERVER_ADDRESS, config.SERVER_PORT)
 
 func init() {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 }
-func TestGetEndpoint(t *testing.T) {
+func TestGetNoItems(t *testing.T) {
 
-	resp, err := http.Get(ENDPOINT)
+	resp, err := http.Get(ENDPOINT.ITEM)
 	if err != nil {
 		t.Errorf("Error in get response %s", err)
 	}
@@ -44,7 +41,7 @@ func TestCreateItem(t *testing.T) {
 		Status:      "available",
 		Price:       180.80,
 	})
-	resp, err := http.Post(ENDPOINT, "application/json",
+	resp, err := http.Post(ENDPOINT.ITEM, "application/json",
 		bytes.NewBuffer(postBody))
 
 	if err != nil {
@@ -71,7 +68,7 @@ func TestCreateItem(t *testing.T) {
 }
 
 func TestEditItem(t *testing.T) {
-	resp, _ := http.Get(ENDPOINT)
+	resp, _ := http.Get(ENDPOINT.ITEM)
 	if resp.StatusCode != 200 {
 		t.Errorf("Got response %d instead 200", resp.StatusCode)
 	}
@@ -88,7 +85,7 @@ func TestEditItem(t *testing.T) {
 	})
 
 	req, _ := http.NewRequest(http.MethodPatch,
-		fmt.Sprintf("%s/%d", ENDPOINT, id),
+		fmt.Sprintf("%s/%d", ENDPOINT.ITEM, id),
 		bytes.NewBuffer(patchBody))
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	res, err := http.DefaultClient.Do(req)
@@ -99,7 +96,7 @@ func TestEditItem(t *testing.T) {
 		t.Errorf("Failed to get response from %v", req)
 	}
 
-	if res == nil || res.StatusCode != 200 {
+	if res.StatusCode != 200 {
 		t.Errorf("Got response %d instead 200", res.StatusCode)
 	}
 	var patchOut model.Item
@@ -116,7 +113,7 @@ func TestEditItem(t *testing.T) {
 	}
 }
 func TestRemoveItem(t *testing.T) {
-	resp, _ := http.Get(ENDPOINT)
+	resp, _ := http.Get(ENDPOINT.ITEM)
 	if resp.StatusCode != 200 {
 		t.Errorf("Got response %d instead 200", resp.StatusCode)
 	}
@@ -129,7 +126,7 @@ func TestRemoveItem(t *testing.T) {
 	id := outArr[0].ID
 
 	req, _ := http.NewRequest(http.MethodDelete,
-		fmt.Sprintf("%s/%d", ENDPOINT, id),
+		fmt.Sprintf("%s/%d", ENDPOINT.ITEM, id),
 		nil)
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -139,5 +136,5 @@ func TestRemoveItem(t *testing.T) {
 		t.Errorf("Failed to get response from %v", req)
 	}
 	// Recall first test to check if no items are available now
-	TestGetEndpoint(t)
+	TestGetNoItems(t)
 }
