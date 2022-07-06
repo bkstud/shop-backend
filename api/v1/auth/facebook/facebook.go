@@ -34,12 +34,10 @@ func init() {
 
 // LoginHandler handles the login procedure.
 func LoginHandler(c *gin.Context) {
-	log.Println("facebook login handler")
 	auth.LoginHandler(c, conf)
 }
 
 func AuthHandler(c *gin.Context) {
-	log.Printf("facebook auth handler")
 	client := auth.AuthHandler(c, conf)
 	if client == nil {
 		return

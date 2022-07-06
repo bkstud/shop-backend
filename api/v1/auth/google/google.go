@@ -37,12 +37,10 @@ func init() {
 
 // LoginHandler handles the login procedure.
 func LoginHandler(c *gin.Context) {
-	log.Println("google login handler")
 	auth.LoginHandler(c, conf)
 }
 
 func AuthHandler(c *gin.Context) {
-	log.Printf("google auth handler")
 	client := auth.AuthHandler(c, conf)
 
 	data := auth.GetUserData(c, client, "https://www.googleapis.com/oauth2/v3/userinfo")
