@@ -7,7 +7,9 @@ import (
 	"os"
 	"shop/api/v1/auth"
 	"shop/api/v1/route"
+	"shop/config"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -27,6 +29,12 @@ func main() {
 		Path:   "/",
 		MaxAge: 86400 * 7,
 	})
+
+	corsConf := cors.DefaultConfig()
+	corsConf.AllowOrigins = []string{"http://" + config.FRONTEND_HOSTNAME,
+		"https://" + config.FRONTEND_HOSTNAME}
+	corsConf.AllowCredentials = true
+	routerHttps.Use(cors.New(corsConf))
 
 	routerHttps.Use(gin.Recovery())
 	routerHttps.Use(sessions.Sessions("store", store))

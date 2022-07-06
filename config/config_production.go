@@ -6,7 +6,9 @@ package config
 import "os"
 
 var (
-	SERVER_ADDRESS = "https://" + os.Getenv("WEBSITE_HOSTNAME")
+	SERVER_ADDRESS    = "https://" + os.Getenv("WEBSITE_HOSTNAME")
+	FRONTEND_HOSTNAME = os.Getenv("FRONTEND_HOSTNAME")
+	FRONTEND_ADDRESS  = "http://" + os.Getenv("FRONTEND_HOSTNAME")
 )
 
 const (
