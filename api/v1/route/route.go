@@ -8,4 +8,5 @@ func AddRoutes(rg *gin.RouterGroup) {
 	addAuthRoutes(rg)
 	addItemRoutes(rg)
 	addTransactionRoutes(rg)
+	addUserRoutes(rg)
 }
