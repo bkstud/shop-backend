@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"shop/api/v1/database"
@@ -76,6 +77,9 @@ func LoginHandler(c *gin.Context, conf *oauth2.Config) {
 
 	session := sessions.Default(c)
 	session.Set("state", state)
+	fmt.Println(c.Request.URL.User)
+	fmt.Println(c.Request.Referer())
+
 	err = session.Save()
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{"message": "Error while saving session."})
