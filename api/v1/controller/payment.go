@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"shop/api/v1/auth"
 	"shop/config"
 	"strconv"
 
@@ -14,9 +15,7 @@ import (
 )
 
 func CreateCheckoutSession(c *gin.Context) {
-
 	c.Request.ParseForm()
-	fmt.Println()
 	prices := c.Request.PostForm["price"]
 	names := c.Request.PostForm["name"]
 
@@ -35,8 +34,12 @@ func CreateCheckoutSession(c *gin.Context) {
 				Quantity: stripe.Int64(1),
 			})
 	}
-	//TODO Read from variable
-	stripe.Key = ""
+
+	cred, err := auth.ReadOauthSecrets("./secrets/stripe-creds.json", "STRIPE")
+	if err != nil {
+		log.Panic("Failed to initialize facebook credentials")
+	}
+	stripe.Key = cred.Csecret
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("user-id"))
 	params := &stripe.CheckoutSessionParams{
