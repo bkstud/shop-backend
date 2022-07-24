@@ -56,5 +56,5 @@ func AuthHandler(c *gin.Context) {
 	primaryUser.Type = "github"
 	auth.SetIdentityEmail(c, primaryUser.Email)
 	auth.CreateUserFromResponse(&primaryUser)
-	c.Redirect(http.StatusTemporaryRedirect, config.FRONTEND_ADDRESS)
+	c.Redirect(http.StatusTemporaryRedirect, config.FRONTEND_ADDRESS+auth.LastLocation)
 }

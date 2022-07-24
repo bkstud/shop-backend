@@ -26,6 +26,8 @@ type Credentials struct {
 	Csecret string `json:"csecret"`
 }
 
+var LastLocation string
+
 func ReadOauthSecrets(secretfile string, varPostfix string) (Credentials, error) {
 	var cred Credentials
 	if _, err := os.Stat(secretfile); errors.Is(err, os.ErrNotExist) {
@@ -69,6 +71,7 @@ func RandToken(l int) (string, error) {
 }
 
 func LoginHandler(c *gin.Context, conf *oauth2.Config) {
+	LastLocation = c.DefaultQuery("location", "")
 	state, err := RandToken(32)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
