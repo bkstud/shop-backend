@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"shop/config"
+	"strconv"
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -13,36 +14,37 @@ import (
 )
 
 func CreateCheckoutSession(c *gin.Context) {
-	stripe.Key = "sk_test_51LMZKLIYEkANHE3L5vMzodC8FMtjo99Nm0RecxG1VOntoohvnp7Tgn0TGbaIVKOQQoSFT3OUF72roSWEmjrOJcjc00DmrqsJ4Y"
+
+	c.Request.ParseForm()
+	fmt.Println()
+	prices := c.Request.PostForm["price"]
+	names := c.Request.PostForm["name"]
+
+	items := []*stripe.CheckoutSessionLineItemParams{}
+	for index := range names {
+		floatPrice, _ := strconv.ParseFloat(prices[index], 64)
+		items = append(items,
+			&stripe.CheckoutSessionLineItemParams{
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String("usd"),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String(names[index]),
+					},
+					UnitAmount: stripe.Int64(int64(floatPrice * 100)),
+				},
+				Quantity: stripe.Int64(1),
+			})
+	}
+	//TODO Read from variable
+	stripe.Key = ""
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("user-id"))
 	params := &stripe.CheckoutSessionParams{
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
 		CustomerEmail: stripe.String(email),
-		LineItems: []*stripe.CheckoutSessionLineItemParams{
-			&stripe.CheckoutSessionLineItemParams{
-				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
-					Currency: stripe.String("usd"),
-					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
-						Name: stripe.String("Item1"),
-					},
-					UnitAmount: stripe.Int64(200),
-				},
-				Quantity: stripe.Int64(1),
-			},
-			&stripe.CheckoutSessionLineItemParams{
-				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
-					Currency: stripe.String("usd"),
-					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
-						Name: stripe.String("Item2"),
-					},
-					UnitAmount: stripe.Int64(200),
-				},
-				Quantity: stripe.Int64(1),
-			},
-		},
-		SuccessURL: stripe.String(config.FRONTEND_ADDRESS + "/checkout?success=true"),
-		CancelURL:  stripe.String(config.FRONTEND_ADDRESS + "/checkout?cancel=true"),
+		LineItems:     items,
+		SuccessURL:    stripe.String(config.FRONTEND_ADDRESS + "/checkout?success=true"),
+		CancelURL:     stripe.String(config.FRONTEND_ADDRESS + "/checkout?canceled=true"),
 	}
 
 	s, err := stripeSession.New(params)
@@ -57,9 +59,5 @@ func CreateCheckoutSession(c *gin.Context) {
 }
 
 func handleSuccess(c *gin.Context) {
-
-}
-
-func handleFailure(c *gin.Context) {
 
 }
