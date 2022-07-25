@@ -26,6 +26,8 @@ type Credentials struct {
 	Csecret string `json:"csecret"`
 }
 
+// Warning this may not be thread safe and may not work in case of heavy load
+// left for demo purposes
 var LastLocation string
 
 func ReadOauthSecrets(secretfile string, varPostfix string) (Credentials, error) {
