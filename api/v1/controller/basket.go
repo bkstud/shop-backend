@@ -90,9 +90,9 @@ func UpdateBasketItems(c *gin.Context) {
 // Deletes basket for specific user
 func DeleteBasket(c *gin.Context) {
 	basket := findOrCreateBasketByEmail(c)
-	if err := Db.Delete(&basket).Error; err != nil {
+	if err := Db.Model(&basket).Association("Items").Delete(&basket); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error()})
+			"error": err})
 		return
 	}
 	c.JSON(http.StatusOK, basket)
