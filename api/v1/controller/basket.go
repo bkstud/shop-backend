@@ -39,10 +39,9 @@ func findOrCreateBasketByEmail(c *gin.Context) *model.Basket {
 func GetBasketItems(c *gin.Context) {
 	basket := findOrCreateBasketByEmail(c)
 	if basket == nil {
-		basket = new(model.Basket)
 		return
 	}
-	c.JSON(http.StatusOK, basket)
+	c.JSON(http.StatusOK, basket.Items)
 }
 
 // Creates new basket
@@ -66,16 +65,21 @@ func UpdateBasketItems(c *gin.Context) {
 	if basket == nil {
 		return
 	}
+	Db.Model(&basket).Association("Items")
 	newItems := new([]model.Item)
-	if err := c.Bind(newItems); err != nil {
+	if err := c.BindJSON(newItems); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	// newEntries := new([]model.Entry)
-	// basket.Items = *newItems
-	if err := Db.Save(&basket).Error; err != nil {
+	newEntries := []model.BasketEntry{}
+
+	for _, item := range *newItems {
+		newEntries = append(newEntries, model.BasketEntry{BasketID: int(basket.ID), Item: item})
+	}
+
+	if err := Db.Model(&basket).Association("Items").Replace(&newEntries); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error()})
+			"error": err})
 		return
 	}
 
