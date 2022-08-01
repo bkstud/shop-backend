@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddPaymentRoutes(rg *gin.RouterGroup) {
+func addPaymentRoutes(rg *gin.RouterGroup) {
 	paymentGroup := rg.Group("/payment")
 
 	paymentGroup.Use(middleware.AuthorizeRequest())

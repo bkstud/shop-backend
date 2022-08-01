@@ -29,7 +29,6 @@ func main() {
 		Path:   "/",
 		MaxAge: 86400 * 7,
 	})
-
 	corsConf := cors.DefaultConfig()
 	corsConf.AllowOrigins = []string{"http://" + config.FRONTEND_HOSTNAME,
 		"https://" + config.FRONTEND_HOSTNAME}

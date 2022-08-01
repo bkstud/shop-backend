@@ -28,6 +28,8 @@ func init() {
 	db.AutoMigrate(&model.Item{})
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Transaction{})
+	db.AutoMigrate(&model.Basket{})
+	db.AutoMigrate(&model.BasketEntry{})
 
 	Database = db
 }

@@ -11,11 +11,11 @@ func addBasketRoutes(rg *gin.RouterGroup) {
 	basketGroup := rg.Group("/basket")
 	basketGroup.Use(middleware.AuthorizeRequest())
 	{
-		basketGroup.GET("/", controller.GetBasket)
+		basketGroup.GET("/", controller.GetBasketItems)
 
 		basketGroup.POST("/", controller.CreateBasket)
 
-		basketGroup.PATCH("/", controller.UpdateBasket)
+		basketGroup.PATCH("/", controller.UpdateBasketItems)
 
 		basketGroup.DELETE("/", controller.DeleteBasket)
 	}
