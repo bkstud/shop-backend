@@ -14,6 +14,7 @@ func addPaymentRoutes(rg *gin.RouterGroup) {
 	{
 		// paymentGroup.GET("/", controller.CreateCheckoutSession)
 		paymentGroup.POST("/create-checkout-session", controller.CreateCheckoutSession)
+		paymentGroup.GET("/success", controller.HandleSuccess)
 	}
 
 }
