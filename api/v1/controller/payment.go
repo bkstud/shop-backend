@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"shop/api/v1/auth"
 	"shop/config"
-	"strconv"
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -28,23 +27,25 @@ func init() {
 
 func CreateCheckoutSession(c *gin.Context) {
 	c.Request.ParseForm()
-	// TODO: prices and names can't be retrieved from form as this can be exploited
-	// They have to be taken from Items database by ID.
-	prices := c.Request.PostForm["price"]
-	names := c.Request.PostForm["name"]
 	ids := c.Request.PostForm["id"]
 
 	items := []*stripe.CheckoutSessionLineItemParams{}
-	for index, prodID := range ids {
-		floatPrice, _ := strconv.ParseFloat(prices[index], 64)
+	for _, prodID := range ids {
+		internalItem := FindItemById(c, prodID)
+		if internalItem == nil {
+			return
+		}
+		itemPrice := internalItem.Price
+		itemName := internalItem.Name
+
 		item := &stripe.CheckoutSessionLineItemParams{
 			PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
 				Currency: stripe.String("usd"),
 				ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
-					Name:     stripe.String(names[index]),
+					Name:     stripe.String(itemName),
 					Metadata: map[string]string{"InternalID": prodID},
 				},
-				UnitAmount: stripe.Int64(int64(floatPrice * 100)),
+				UnitAmount: stripe.Int64(int64(itemPrice * 100)),
 			},
 			Quantity: stripe.Int64(1),
 		}
@@ -57,14 +58,14 @@ func CreateCheckoutSession(c *gin.Context) {
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
 		CustomerEmail: stripe.String(email),
 		LineItems:     items,
-		SuccessURL:    stripe.String("https://localhost:5000/api/v1/payment/success?session_id={CHECKOUT_SESSION_ID}"), //stripe.String(config.FRONTEND_ADDRESS + "/checkout?success=true"),
+		SuccessURL:    stripe.String("https://localhost:5000/api/v1/payment/success?session_id={CHECKOUT_SESSION_ID}"),
 		CancelURL:     stripe.String(config.FRONTEND_ADDRESS + "/checkout?canceled=true"),
 	}
 
 	s, err := stripeSession.New(params)
 
 	if err != nil {
-		log.Panic("Failed to create session: %v", err)
+		log.Panic("Failed to create session:", err)
 	}
 
 	c.Redirect(http.StatusSeeOther, s.URL)

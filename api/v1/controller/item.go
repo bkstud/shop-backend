@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func findItemById(c *gin.Context, id string) *model.Item {
+func FindItemById(c *gin.Context, id string) *model.Item {
 	item := new(model.Item)
 	result := Db.First(&item, id)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -48,7 +48,7 @@ func CreateItem(c *gin.Context) {
 // PATCH /items/:id
 func EditItem(c *gin.Context) {
 	id := c.Param("id")
-	item := findItemById(c, id)
+	item := FindItemById(c, id)
 	if item == nil {
 		return
 	}
@@ -70,9 +70,9 @@ func EditItem(c *gin.Context) {
 // DELETE /items/:id
 func DeleteItem(c *gin.Context) {
 	id := c.Param("id")
-	item := findItemById(c, id)
+	item := FindItemById(c, id)
 	if item == nil {
-		// The response is already handled by findItemById
+		// The response is already handled by FindItemById
 		return
 	}
 
