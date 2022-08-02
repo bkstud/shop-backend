@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"shop/api/v1/auth"
+	"shop/api/v1/model"
 	"shop/config"
+	"strconv"
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -74,14 +76,28 @@ func CreateCheckoutSession(c *gin.Context) {
 func HandleSuccess(c *gin.Context) {
 	query := c.Request.URL.Query()
 	s, _ := stripeSession.Get(query.Get("session_id"), nil)
-	// log.Println("Customer:=", s.Customer)
-	// log.Println("CustomerEmail:=", s.CustomerEmail)
+	user := model.User{}
+	Db.First(&user, "email = ?", s.CustomerEmail)
 	i := stripeSession.ListLineItems(s.ID, &stripe.CheckoutSessionListLineItemsParams{})
 	for i.Next() {
 		line := i.LineItem()
 		p, _ := product.Get(line.Price.Product.ID, nil)
-		log.Println("Got product:=", p)
-		log.Println("Need to create Transaction with ID:=", p.Metadata["InternalID"])
+		id64, err := strconv.ParseUint(p.Metadata["InternalID"], 10, 32)
+		if err != nil {
+			log.Panic("Failed to convert id:", err)
+		}
+		itemID := uint(id64)
+
+		t := model.Transaction{
+			ItemID:  itemID,
+			UserID:  user.ID,
+			Payment: string(s.PaymentStatus),
+			Type:    "purchase",
+			Status:  "pending",
+		}
+		if err := Db.Create(&t).Error; err != nil {
+			log.Panic("Failed to create new Transaction:", err)
+		}
 
 	}
 
