@@ -12,4 +12,5 @@ func AddRoutes(rg *gin.RouterGroup) {
 	addUserRoutes(rg)
 	addPaymentRoutes(rg)
 	addBasketRoutes(rg)
+	addFeedbackRoutes(rg)
 }
