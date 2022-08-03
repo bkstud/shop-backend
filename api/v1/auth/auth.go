@@ -87,7 +87,7 @@ func LoginHandler(c *gin.Context, conf *oauth2.Config) {
 
 	err = session.Save()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.tmpl", gin.H{"message": "Error while saving session."})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error while saving session."})
 		return
 	}
 
@@ -101,7 +101,7 @@ func AuthHandler(c *gin.Context, conf *oauth2.Config) *http.Client {
 	queryState := c.Request.URL.Query().Get("state")
 	if retrievedState != queryState {
 		log.Printf("Invalid session state: retrieved: %s; Param: %s", retrievedState, queryState)
-		c.HTML(http.StatusUnauthorized, "error.tmpl", gin.H{"message": "Invalid session state."})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid session state."})
 		return nil
 	}
 
