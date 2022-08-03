@@ -56,11 +56,12 @@ func CreateCheckoutSession(c *gin.Context) {
 
 	session := sessions.Default(c)
 	email := fmt.Sprintf("%v", session.Get("user-id"))
+	successUrl := fmt.Sprintf("%s:%d/api/v1/payment/success?session_id={CHECKOUT_SESSION_ID}", config.SERVER_ADDRESS, config.SERVER_PORT)
 	params := &stripe.CheckoutSessionParams{
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
 		CustomerEmail: stripe.String(email),
 		LineItems:     items,
-		SuccessURL:    stripe.String("https://localhost:5000/api/v1/payment/success?session_id={CHECKOUT_SESSION_ID}"),
+		SuccessURL:    stripe.String(successUrl),
 		CancelURL:     stripe.String(config.FRONTEND_ADDRESS + "/checkout?canceled=true"),
 	}
 
