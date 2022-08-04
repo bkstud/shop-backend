@@ -13,7 +13,7 @@ RUN apk add --no-cache sqlite-libs sqlite-dev
 RUN apk add --no-cache build-base
 RUN go get ./...
 
-RUN go build
+RUN go build -tags production
 
 EXPOSE 80
 EXPOSE 443

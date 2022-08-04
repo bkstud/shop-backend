@@ -5,3 +5,5 @@ facebook-creds.json
 secrets/
 shop
 cert/
+.git/
+.vscode/
