@@ -3,13 +3,12 @@ package controller
 import (
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"shop/api/v1/model"
 
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 func findTransactionById(c *gin.Context, id string) *model.Transaction {
@@ -25,10 +24,12 @@ func findTransactionById(c *gin.Context, id string) *model.Transaction {
 }
 
 // GET /transactions
-// returns all transactions
+// returns all transactions for user session
 func GetTransactions(c *gin.Context) {
+	session := sessions.Default(c)
+	email := session.Get("user-id")
 	var transactions []model.Transaction
-	Db.Preload(clause.Associations).Preload("User").Find(&transactions)
+	Db.Preload("User").Preload("Item").Find(&transactions).Where("User.Email = ?", email)
 	c.JSON(http.StatusOK, transactions)
 }
 
@@ -44,7 +45,6 @@ func CreateTransaction(c *gin.Context) {
 			"error": err.Error()})
 		return
 	}
-	log.Println("USERID:=", transaction.UserID)
 	c.JSON(http.StatusOK, transaction)
 }
 
