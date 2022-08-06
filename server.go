@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -41,9 +42,12 @@ func main() {
 	v1 := routerHttps.Group("/api/v1")
 	route.AddRoutes(v1)
 
-	// GetCertAndKey()
-	routerHttps.Run(":80")
-	// routerHttps.RunTLS(fmt.Sprintf(":%d", config.SERVER_PORT), "./cert/cert.pem", "./cert/key.pem")
+	if config.ENV == "PRODUCTION" {
+		routerHttps.Run(":80")
+	} else {
+		GetCertAndKey()
+		routerHttps.RunTLS(fmt.Sprintf(":%d", config.SERVER_PORT), "./cert/cert.pem", "./cert/key.pem")
+	}
 
 }
 
