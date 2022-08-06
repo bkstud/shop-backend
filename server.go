@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -42,7 +43,7 @@ func main() {
 	route.AddRoutes(v1)
 
 	GetCertAndKey()
-	routerHttps.RunTLS(":5000", "./cert/cert.pem", "./cert/key.pem")
+	routerHttps.RunTLS(fmt.Sprintf(":%d", config.SERVER_PORT), "./cert/cert.pem", "./cert/key.pem")
 
 }
 
