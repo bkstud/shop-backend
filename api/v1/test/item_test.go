@@ -24,7 +24,7 @@ func TestGetNoItems(t *testing.T) {
 		t.Errorf("Error in get response %s", err)
 	}
 	if resp.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", resp.StatusCode)
+		t.Errorf(not_200_response, resp.StatusCode)
 	}
 	var outArr []model.Item
 	json.NewDecoder(resp.Body).Decode(&outArr)
@@ -49,7 +49,7 @@ func TestCreateItem(t *testing.T) {
 	}
 
 	if resp.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", resp.StatusCode)
+		t.Errorf(not_200_response, resp.StatusCode)
 		data, _ := io.ReadAll(resp.Body)
 		t.Errorf("Response json: %s", string(data))
 	}
@@ -70,7 +70,7 @@ func TestCreateItem(t *testing.T) {
 func TestEditItem(t *testing.T) {
 	resp, _ := http.Get(ENDPOINT.ITEM)
 	if resp.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", resp.StatusCode)
+		t.Errorf(not_200_response, resp.StatusCode)
 	}
 
 	var outArr []model.Item
@@ -97,7 +97,7 @@ func TestEditItem(t *testing.T) {
 	}
 
 	if res.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", res.StatusCode)
+		t.Errorf(not_200_response, res.StatusCode)
 	}
 	var patchOut model.Item
 	json.NewDecoder(res.Body).Decode(&patchOut)
@@ -115,7 +115,7 @@ func TestEditItem(t *testing.T) {
 func TestRemoveItem(t *testing.T) {
 	resp, _ := http.Get(ENDPOINT.ITEM)
 	if resp.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", resp.StatusCode)
+		t.Errorf(not_200_response, resp.StatusCode)
 	}
 
 	var outArr []model.Item

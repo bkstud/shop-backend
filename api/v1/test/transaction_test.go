@@ -26,6 +26,8 @@ var ENDPOINT = struct {
 	API:         fmt.Sprintf("%s:%d/api/v1/", config.SERVER_ADDRESS, config.SERVER_PORT),
 }
 
+var not_200_response = "Got response %d instead 200"
+
 func init() {
 	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 }
@@ -36,7 +38,7 @@ func TestGetNoTransactions(t *testing.T) {
 		t.Errorf("Error in get response %s", err)
 	}
 	if resp.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", resp.StatusCode)
+		t.Errorf(not_200_response, resp.StatusCode)
 	}
 	var outArr []model.Transaction
 	json.NewDecoder(resp.Body).Decode(&outArr)
@@ -72,7 +74,7 @@ func TestCreateTransaction(t *testing.T) {
 	}
 
 	if resp.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", resp.StatusCode)
+		t.Errorf(not_200_response, resp.StatusCode)
 		data, _ := io.ReadAll(resp.Body)
 		t.Errorf("Response json: %s", string(data))
 	}
@@ -103,7 +105,7 @@ func TestEditTransaction(t *testing.T) {
 	}
 
 	if res.StatusCode != 200 {
-		t.Errorf("Got response %d instead 200", res.StatusCode)
+		t.Errorf(not_200_response, res.StatusCode)
 	}
 	var patchOut model.Transaction
 	json.NewDecoder(res.Body).Decode(&patchOut)
