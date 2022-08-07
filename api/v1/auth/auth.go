@@ -11,6 +11,7 @@ import (
 	"os"
 	"shop/api/v1/database"
 	"shop/api/v1/model"
+	"shop/config"
 
 	"log"
 	"net/http"
@@ -153,4 +154,10 @@ func CreateUserFromResponse(responseUser *Response) model.User {
 		db.Create(&user)
 	}
 	return user
+}
+
+func RedirectBack(c *gin.Context) {
+	token, _ := c.Cookie("store")
+	endpoint := fmt.Sprintf("/login/?location=%s&token=%s", LastLocation, token)
+	c.Redirect(http.StatusTemporaryRedirect, config.FRONTEND_ADDRESS+endpoint)
 }

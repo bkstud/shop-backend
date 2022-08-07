@@ -56,5 +56,5 @@ func AuthHandler(c *gin.Context) {
 	resp.Type = "facebook"
 	auth.SetIdentityEmail(c, resp.Email)
 	auth.CreateUserFromResponse(&resp)
-	c.Redirect(http.StatusTemporaryRedirect, config.FRONTEND_ADDRESS+auth.LastLocation)
+	auth.RedirectBack(c)
 }

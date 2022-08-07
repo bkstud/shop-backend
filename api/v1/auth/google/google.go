@@ -54,6 +54,5 @@ func AuthHandler(c *gin.Context) {
 	resp.Type = "google"
 	auth.SetIdentityEmail(c, resp.Email)
 	auth.CreateUserFromResponse(&resp)
-	c.Redirect(http.StatusTemporaryRedirect, config.FRONTEND_ADDRESS+auth.LastLocation)
-
+	auth.RedirectBack(c)
 }
