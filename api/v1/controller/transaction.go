@@ -28,8 +28,10 @@ func findTransactionById(c *gin.Context, id string) *model.Transaction {
 func GetTransactions(c *gin.Context) {
 	session := sessions.Default(c)
 	email := session.Get("user-id")
+	var user model.User
+	Db.Where("email = ?", email).First(&user)
 	var transactions []model.Transaction
-	Db.Preload("User").Preload("Item").Find(&transactions).Where("User.Email = ?", email)
+	Db.Preload("User").Preload("Item").Where("user_id = ?", user.ID).Find(&transactions)
 	c.JSON(http.StatusOK, transactions)
 }
 
