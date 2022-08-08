@@ -7,11 +7,13 @@ import (
 	"log"
 	"os"
 	"shop/api/v1/auth"
+	"shop/api/v1/database"
 	"shop/api/v1/route"
 	"shop/config"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-contrib/sessions"
+	gormsessions "github.com/gin-contrib/sessions/gorm"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,7 +27,8 @@ func main() {
 	if err != nil {
 		log.Fatal("unable to generate random token: ", err)
 	}
-	store := sessions.NewCookieStore([]byte(token))
+	store := gormsessions.NewStore(database.Database, true, []byte(token))
+	// cookie.NewStore([]byte(token))
 	store.Options(sessions.Options{
 		Path:   "/",
 		MaxAge: 86400 * 7,

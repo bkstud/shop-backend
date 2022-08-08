@@ -9,7 +9,7 @@ import (
 	"shop/config"
 	"strconv"
 
-	"github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v72"
 	stripeSession "github.com/stripe/stripe-go/v72/checkout/session"

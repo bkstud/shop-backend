@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"shop/api/v1/model"
 
-	"github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

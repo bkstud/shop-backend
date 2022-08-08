@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"shop/api/v1/middleware"
 
-	"github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +20,12 @@ func addUserRoutes(rg *gin.RouterGroup) {
 				"message": "User logged in",
 				"user":    userEmail,
 			})
+		})
+
+		userGroup.POST("/logout", func(c *gin.Context) {
+			session := sessions.Default(c)
+			session.Clear()
+			session.Save()
 		})
 	}
 
