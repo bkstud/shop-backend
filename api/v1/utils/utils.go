@@ -15,7 +15,7 @@ func RandString(l int) (string, error) {
 	if _, err := rand.Read(b); err != nil {
 		return "", err
 	}
-	return base64.StdEncoding.EncodeToString(b), nil
+	return base64.URLEncoding.EncodeToString(b), nil
 }
 
 // Credentials which stores google ids.

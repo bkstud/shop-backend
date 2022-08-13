@@ -26,3 +26,8 @@ func CreateOrUpdateToken(email string) (*model.Token, error) {
 	}
 	return token, nil
 }
+
+// Deletes token identified by email
+func DeleteToken(email string) error {
+	return Db.Where("user_email = ?", email).Delete(&model.Token{}).Error
+}
