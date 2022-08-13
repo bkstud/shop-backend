@@ -6,14 +6,13 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"shop/api/v1/auth"
-	"shop/api/v1/database"
 	"shop/api/v1/route"
+	"shop/api/v1/utils"
 	"shop/config"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	gormsessions "github.com/gin-contrib/sessions/gorm"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,12 +22,12 @@ var (
 
 func main() {
 
-	token, err := auth.RandToken(64)
+	token, err := utils.RandString(64)
 	if err != nil {
 		log.Fatal("unable to generate random token: ", err)
 	}
-	store := gormsessions.NewStore(database.Database, true, []byte(token))
-	// cookie.NewStore([]byte(token))
+	store := cookie.NewStore([]byte(token))
+
 	store.Options(sessions.Options{
 		Path:   "/",
 		MaxAge: 86400 * 7,
@@ -37,6 +36,7 @@ func main() {
 	corsConf.AllowOrigins = []string{"http://" + config.FRONTEND_HOSTNAME,
 		"https://" + config.FRONTEND_HOSTNAME}
 	corsConf.AllowCredentials = true
+	corsConf.AllowHeaders = []string{"token"}
 	routerHttps.Use(cors.New(corsConf))
 
 	routerHttps.Use(gin.Recovery())

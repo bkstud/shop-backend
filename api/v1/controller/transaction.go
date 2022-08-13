@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"shop/api/v1/model"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -26,8 +25,7 @@ func findTransactionById(c *gin.Context, id string) *model.Transaction {
 // GET /transactions
 // returns all transactions for user session
 func GetTransactions(c *gin.Context) {
-	session := sessions.Default(c)
-	email := session.Get("user-id")
+	email := c.MustGet("user-email")
 	var user model.User
 	Db.Where("email = ?", email).First(&user)
 	var transactions []model.Transaction

@@ -4,23 +4,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"shop/api/v1/auth"
 	"shop/api/v1/model"
+	"shop/api/v1/utils"
 	"shop/config"
 	"strconv"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/stripe/stripe-go/v72"
 	stripeSession "github.com/stripe/stripe-go/v72/checkout/session"
 	"github.com/stripe/stripe-go/v72/product"
 )
 
-var cred auth.Credentials
+var cred utils.Credentials
 
 func init() {
 	var err error
-	cred, err = auth.ReadOauthSecrets("./secrets/stripe-creds.json", "STRIPE")
+	cred, err = utils.ReadOauthSecrets("./secrets/stripe-creds.json", "STRIPE")
 	if err != nil {
 		log.Panic("Failed to initialize stripe credentials")
 	}
@@ -54,8 +53,7 @@ func CreateCheckoutSession(c *gin.Context) {
 		items = append(items, item)
 	}
 
-	session := sessions.Default(c)
-	email := fmt.Sprintf("%v", session.Get("user-id"))
+	email := fmt.Sprintf("%v", c.MustGet("user-email"))
 	successUrl := fmt.Sprintf("%s:%d/api/v1/payment/success?session_id={CHECKOUT_SESSION_ID}", config.SERVER_ADDRESS, config.SERVER_PORT)
 	params := &stripe.CheckoutSessionParams{
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),

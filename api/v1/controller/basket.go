@@ -6,14 +6,12 @@ import (
 	"net/http"
 	"shop/api/v1/model"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func findOrCreateBasketByEmail(c *gin.Context) *model.Basket {
-	session := sessions.Default(c)
-	email := session.Get("user-id")
+	email := c.MustGet("user-email")
 	if email == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Email not found is there a session?."})
 		return nil

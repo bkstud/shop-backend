@@ -30,6 +30,7 @@ func init() {
 	db.AutoMigrate(&model.Basket{})
 	db.AutoMigrate(&model.BasketEntry{})
 	db.AutoMigrate(&model.Feedback{})
+	db.AutoMigrate(&model.Token{})
 
 	Database = db
 

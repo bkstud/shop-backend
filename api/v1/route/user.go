@@ -14,8 +14,7 @@ func addUserRoutes(rg *gin.RouterGroup) {
 	userGroup.Use(middleware.AuthorizeRequest())
 	{
 		userGroup.GET("/", func(c *gin.Context) {
-			session := sessions.Default(c)
-			userEmail := session.Get("user-id")
+			userEmail := c.MustGet("user-email")
 			c.JSON(http.StatusOK, gin.H{
 				"message": "User logged in",
 				"user":    userEmail,

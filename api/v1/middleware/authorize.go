@@ -3,9 +3,9 @@ package middleware
 import (
 	"net/http"
 
+	"shop/api/v1/controller"
 	"shop/config"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,13 +13,25 @@ import (
 func AuthorizeRequest() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if config.ENV != "TEST" {
-			session := sessions.Default(c)
-			v := session.Get("user-id")
-			if v == nil {
+
+			bearer := c.GetHeader("Token")
+
+			if bearer == "" {
 				c.JSON(http.StatusUnauthorized, gin.H{"error": "Not logged in.",
-					"message": "Please log in."})
+					"message": "Please provide bearer token header."})
 				c.Abort()
+				return
 			}
+
+			token, exists := controller.GetToken(bearer)
+			if !exists {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Not logged in.",
+					"message": "Invalid token."})
+				c.Abort()
+				return
+
+			}
+			c.Set("user-email", token.UserEmail)
 		}
 		c.Next()
 	}

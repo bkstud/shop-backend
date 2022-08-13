@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"shop/api/v1/auth"
+	"shop/api/v1/utils"
 	"shop/config"
 
 	"github.com/gin-gonic/gin"
@@ -13,12 +14,12 @@ import (
 	"golang.org/x/oauth2/github"
 )
 
-var cred auth.Credentials
+var cred utils.Credentials
 var conf *oauth2.Config
 
 func init() {
 	var err error
-	cred, err = auth.ReadOauthSecrets("./secrets/github-creds.json", "GITHUB")
+	cred, err = utils.ReadOauthSecrets("./secrets/github-creds.json", "GITHUB")
 	if err != nil {
 		log.Panic("Failed to initialize github credentials")
 	}

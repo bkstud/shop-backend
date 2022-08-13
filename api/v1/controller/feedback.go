@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"shop/api/v1/model"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,8 +12,7 @@ import (
 // Provides feedback that user with current session provided.
 func GetFeedback(c *gin.Context) {
 	var feedbacks []model.Feedback
-	session := sessions.Default(c)
-	email := session.Get("user-id")
+	email := c.MustGet("user-email")
 	if email == nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Email not found - anonymous feedback is reserved for admin user."})
 		return
@@ -33,8 +31,7 @@ func CreateFeedback(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	session := sessions.Default(c)
-	email := session.Get("user-id")
+	email := c.MustGet("user-email")
 	if email != nil {
 		feedback.UserEmail = fmt.Sprintf("%v", email)
 	}

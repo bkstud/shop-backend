@@ -8,5 +8,4 @@ type User struct {
 	Name  string
 	Token string
 	Type  string
-	// Transactions []Transaction
 }
