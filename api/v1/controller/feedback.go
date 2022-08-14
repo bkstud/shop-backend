@@ -12,8 +12,8 @@ import (
 // Provides feedback that user with current session provided.
 func GetFeedback(c *gin.Context) {
 	var feedbacks []model.Feedback
-	email := c.MustGet("user-email")
-	if email == nil {
+	email, exists := c.Get("user-email")
+	if !exists {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Email not found - anonymous feedback is reserved for admin user."})
 		return
 	}
@@ -31,8 +31,8 @@ func CreateFeedback(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	email := c.MustGet("user-email")
-	if email != nil {
+	email, exists := c.Get("user-email")
+	if exists {
 		feedback.UserEmail = fmt.Sprintf("%v", email)
 	}
 	if err := Db.Create(feedback).Error; err != nil {

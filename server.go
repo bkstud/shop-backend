@@ -36,7 +36,7 @@ func main() {
 	corsConf.AllowOrigins = []string{"http://" + config.FRONTEND_HOSTNAME,
 		"https://" + config.FRONTEND_HOSTNAME}
 	corsConf.AllowCredentials = true
-	corsConf.AllowHeaders = []string{"token"}
+	corsConf.AllowHeaders = []string{"token", "content-type"}
 	routerHttps.Use(cors.New(corsConf))
 
 	routerHttps.Use(gin.Recovery())
