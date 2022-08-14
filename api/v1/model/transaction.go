@@ -14,4 +14,6 @@ type Transaction struct {
 	// The realization status - providing product to customer
 	// Either pending or finished
 	Status string
+	// id of stripe session
+	SessionID string `gorm:"not null;default:null"`
 }

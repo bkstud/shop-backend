@@ -10,11 +10,10 @@ import (
 func addPaymentRoutes(rg *gin.RouterGroup) {
 	paymentGroup := rg.Group("/payment")
 
+	paymentGroup.GET("/success", controller.HandleSuccess)
 	paymentGroup.Use(middleware.AuthorizeRequest())
 	{
-		// paymentGroup.GET("/", controller.CreateCheckoutSession)
 		paymentGroup.POST("/create-checkout-session", controller.CreateCheckoutSession)
-		paymentGroup.GET("/success", controller.HandleSuccess)
 	}
 
 }

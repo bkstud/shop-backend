@@ -27,9 +27,19 @@ func init() {
 }
 
 func CreateCheckoutSession(c *gin.Context) {
-	c.Request.ParseForm()
-	ids := c.Request.PostForm["id"]
-
+	type ItemsJSON struct {
+		Items []string
+	}
+	jsonData := ItemsJSON{}
+	if err := c.Bind(&jsonData); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	ids := jsonData.Items
+	if ids == nil || len(ids) == 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "No items provided."})
+		return
+	}
 	items := []*stripe.CheckoutSessionLineItemParams{}
 	for _, prodID := range ids {
 		internalItem := FindItemById(c, prodID)
@@ -69,12 +79,17 @@ func CreateCheckoutSession(c *gin.Context) {
 		log.Panic("Failed to create session:", err)
 	}
 
-	c.Redirect(http.StatusSeeOther, s.URL)
+	c.JSON(http.StatusOK, s.URL)
 }
 
 func HandleSuccess(c *gin.Context) {
 	query := c.Request.URL.Query()
 	s, _ := stripeSession.Get(query.Get("session_id"), nil)
+
+	if s.PaymentStatus != "paid" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "Session is not successfully paid."})
+		return
+	}
 	user := model.User{}
 	Db.First(&user, "email = ?", s.CustomerEmail)
 	i := stripeSession.ListLineItems(s.ID, &stripe.CheckoutSessionListLineItemsParams{})
@@ -88,11 +103,12 @@ func HandleSuccess(c *gin.Context) {
 		itemID := uint(id64)
 
 		t := model.Transaction{
-			ItemID:  itemID,
-			UserID:  user.ID,
-			Payment: string(s.PaymentStatus),
-			Type:    "purchase",
-			Status:  "pending",
+			ItemID:    itemID,
+			UserID:    user.ID,
+			Payment:   string(s.PaymentStatus),
+			Type:      "purchase",
+			Status:    "pending",
+			SessionID: s.ID,
 		}
 		if err := Db.Create(&t).Error; err != nil {
 			log.Panic("Failed to create new Transaction:", err)
