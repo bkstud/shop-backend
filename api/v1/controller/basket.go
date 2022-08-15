@@ -63,7 +63,7 @@ func UpdateBasketItems(c *gin.Context) {
 	if basket == nil {
 		return
 	}
-	Db.Model(&basket).Association("Items")
+	Db.Model(&basket).Association("Items").Clear()
 	newItems := new([]model.Item)
 	if err := c.BindJSON(newItems); err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
@@ -72,10 +72,10 @@ func UpdateBasketItems(c *gin.Context) {
 	newEntries := []model.BasketEntry{}
 
 	for _, item := range *newItems {
-		newEntries = append(newEntries, model.BasketEntry{BasketID: int(basket.ID), Item: item})
+		newEntries = append(newEntries, model.BasketEntry{BasketID: int(basket.ID), Item: item, ItemID: item.ID})
 	}
-
-	if err := Db.Model(&basket).Association("Items").Replace(&newEntries); err != nil {
+	basket.Items = newEntries
+	if err := Db.Save(&basket).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err})
 		return

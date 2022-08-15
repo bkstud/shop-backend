@@ -10,7 +10,7 @@ type Basket struct {
 
 type BasketEntry struct {
 	gorm.Model
-	BasketID int `gorm:"not null;default:null"`
+	BasketID int
 	ItemID   uint
 	Item
 }
